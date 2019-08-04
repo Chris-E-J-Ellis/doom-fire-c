@@ -1,11 +1,8 @@
 #include <unistd.h>
 #include <time.h>
-#include <SDL2/SDL.h>
 #include <stdio.h>
-
-#define SCREEN_HEIGHT 100
-#define SCREEN_WIDTH 100
-#define CUSTOM_PALETTE_SIZE 37
+#include <stdbool.h>
+#include <SDL2/SDL.h>
 
 static int *screenBuffer;
 static Uint8 doomRGBValues[] = {
@@ -54,12 +51,21 @@ void InitBuffer(int width, int height, int ignitionValue);
 void StepFire(int width, int height);
 void SpreadFire(int sourcePosition, int width);
 
-int main()
+int main(int argc, char **argv)
 {
-    int width = 100;
-    int height = 100;
+    if (argc < 3)
+    {
+        printf("Insufficient arguments supplied.");
+        printf("Usage: doom-fire [WIDTH] [HEIGHT]\n");
+        return 1;
+    }
+
+    int width = atoi(argv[1]);
+    int height = atoi(argv[2]);
+
     screenBuffer = (int*)malloc(width * height * sizeof(int));
-    InitBuffer(width, height, CUSTOM_PALETTE_SIZE - 1);
+    int pallete_Size = sizeof(doomRGBValues)/sizeof(Uint8) / 3;
+    InitBuffer(width, height, pallete_Size - 1);
 
     SDL_Window* window = NULL;
     SDL_Renderer* renderer = NULL;
@@ -70,7 +76,7 @@ int main()
         return 1;
     }
 
-    SDL_CreateWindowAndRenderer(SCREEN_HEIGHT, SCREEN_WIDTH, 0, &window, &renderer);
+    SDL_CreateWindowAndRenderer(width, height, 0, &window, &renderer);
     if( window == NULL )
     {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
@@ -78,21 +84,23 @@ int main()
     }
 
     // Wait before drawing on the window, seemingly KDE related 
-    SDL_Delay(100);
-
-    for (Uint8 i = 0;i < 100; i++)
+    bool quit = false;
+    SDL_Event e;
+    while (!quit)
     {
+        while(SDL_PollEvent( &e ) != 0)
+        {
+            if(e.type == SDL_QUIT)
+                quit = true;
+        }
+
+        if (quit) 
+            break;
+
         DrawBuffer(width, height, renderer);
         StepFire(width, height);
 
         usleep(10000);
-
-        //SDL_SetRenderDrawColor(renderer, i, i, i, 255);
-        //SDL_RenderDrawPoint(renderer, i, i);
-        //SDL_RenderDrawPoint(renderer, 255-i, i);
-        //SDL_RenderPresent(renderer);
-        //SDL_RenderClear(renderer);
-        //SDL_Delay(10);
     }
 
     SDL_DestroyRenderer(renderer);
@@ -119,7 +127,6 @@ void DrawBuffer(int width, int height, SDL_Renderer *renderer)
         }
     }
 
-    SDL_Delay(10);
     SDL_RenderPresent(renderer);
 }
 
