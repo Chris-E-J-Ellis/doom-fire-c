@@ -1,12 +1,12 @@
-#ifndef DOOM_FIRE_H
-#define DOOM_FIRE_H
+#ifndef DOOM_FIRE_ENGINE_H
+#define DOOM_FIRE_ENGINE_H
 
 #include <stdint.h>
 
-void init_buffer(int *buffer, int width, int height, int ignitionValue);
-void step_fire(int *buffer, int width, int height);
+void init_buffer(int *const buffer, int width, int height, int ignitionValue);
+void step_fire(int *const buffer, int width, int height);
 
-static const uint8_t DoomRGBValues[] = {
+static const uint8_t DOOM_RGB_VALUES[] = {
     0x07,0x07,0x07,
     0x1F,0x07,0x07,
     0x2F,0x0F,0x07,

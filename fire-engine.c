@@ -1,10 +1,13 @@
-#include "fire-engine.h" 
+#include <time.h>
 #include <stdlib.h>
+#include "fire-engine.h" 
 
-static void spread_fire(int * buffer, int sourcePosition, int width);
+static void spread_fire(int *const buffer, int sourcePosition, int width);
 
-void init_buffer(int* buffer, int width, int height, int ignitionValue)
+void init_buffer(int *const buffer, const int width, const int height, const int ignitionValue)
 {
+    srand(time(NULL));
+
     for (int i = 0; i < height * width; i++) 
     {
         buffer[i] = 0;
@@ -16,7 +19,7 @@ void init_buffer(int* buffer, int width, int height, int ignitionValue)
     }
 }
 
-void step_fire(int *buffer, int width, int height)
+void step_fire(int *const buffer, int width, int height)
 {
     for (int x = 0; x < width; x++) 
     {
@@ -28,7 +31,7 @@ void step_fire(int *buffer, int width, int height)
     }
 }
 
-static void spread_fire(int *buffer, int sourcePosition, int width)
+static void spread_fire(int *const buffer, int sourcePosition, int width)
 {
     int pixel = buffer[sourcePosition];
 
