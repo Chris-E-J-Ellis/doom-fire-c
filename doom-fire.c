@@ -13,29 +13,36 @@ static void sig_handler(int input)
 
 int main(int argc, char **argv)
 {
+    bool argumentError = false; 
+
     if (argc < 3)
     {
-        printf("Insufficient arguments supplied.");
-        printf("Usage: doom-fire [WIDTH] [HEIGHT]");
-        return 1;
+        printf("Insufficient arguments supplied.\n");
+        printf("Usage: doom-fire [WIDTH] [HEIGHT]\n");
+        argumentError = true;
     }
+
+    if (process_additional_args(argc - 3, &argv[3]) == 1)
+    {
+        printf("Unable to process additional arguments.");
+        argumentError = true;
+    }
+
+    if (argumentError)
+        return 1;
 
     int width = atoi(argv[1]);
     int height = atoi(argv[2]);
 
-    if (check_args(argc, argv) != 0)
-    {
-        return 1;
-    }
+    DoomFireBuffer *buffer = NULL;
+    create_buffer(width, height, &buffer);
 
-    int *const screenBuffer = (int *const)malloc(width * height * sizeof(int));
-
-    int initSuccessful = init_renderer(width, height);
+    int initSuccessful = init_renderer(buffer);
     if (initSuccessful != 0)
         return initSuccessful;
 
     int ignitionValue = get_max_ignition_value(); 
-    init_buffer(screenBuffer, width, height, ignitionValue);
+    init_buffer(buffer, ignitionValue);
 
     signal(SIGINT, sig_handler);
 
@@ -44,12 +51,12 @@ int main(int argc, char **argv)
         if (exit_requested()) 
             keepRunning = false;
 
-        draw_buffer(screenBuffer, width, height);
-        step_fire(screenBuffer, width, height);
+        draw_buffer(buffer);
+        step_fire(buffer);
         wait();
     }
 
-    free(screenBuffer);
+    destroy_buffer(&buffer);
     cleanup_renderer();
 
     printf("Done...\n");

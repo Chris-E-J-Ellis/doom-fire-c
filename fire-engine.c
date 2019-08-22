@@ -4,29 +4,43 @@
 
 static void spread_fire(int *const buffer, int sourcePosition, int width);
 
-void init_buffer(int *const buffer, const int width, const int height, const int ignitionValue)
+void create_buffer(int width, int height, DoomFireBuffer **buffer)
+{
+    *buffer = malloc(sizeof(DoomFireBuffer)); 
+    (*buffer)->width = width;
+    (*buffer)->height = height;
+    (*buffer)->buffer = malloc(width * height * sizeof(int));
+}
+
+void destroy_buffer(DoomFireBuffer **const buffer)
+{
+    free((*buffer)->buffer);
+    free(*buffer);
+}
+
+void init_buffer(DoomFireBuffer *const buffer, const int ignitionValue)
 {
     srand(time(NULL));
 
-    for (int i = 0; i < height * width; i++) 
+    for (int i = 0; i < buffer->height * buffer->width; i++) 
     {
-        buffer[i] = 0;
+        buffer->buffer[i] = 0;
     }
 
-    for (int i = (height - 1) * width; i < height * width; i++) 
+    for (int i = (buffer->height - 1) * buffer->width; i < buffer->height * buffer->width; i++) 
     {
-        buffer[i] = ignitionValue;
+        buffer->buffer[i] = ignitionValue;
     }
 }
 
-void step_fire(int *const buffer, int width, int height)
+void step_fire(DoomFireBuffer *const buffer)
 {
-    for (int x = 0; x < width; x++) 
+    for (int x = 0; x < buffer->width; x++) 
     {
-        for (int y = 1; y < height; y++) 
+        for (int y = 1; y < buffer->height; y++) 
         {
-            int bufferPos = (y * width) + x;
-            spread_fire(buffer, bufferPos, width);
+            int bufferPos = (y * buffer->width) + x;
+            spread_fire(buffer->buffer, bufferPos, buffer->width);
         }
     }
 }

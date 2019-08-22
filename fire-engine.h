@@ -3,8 +3,16 @@
 
 #include <stdint.h>
 
-void init_buffer(int *const buffer, int width, int height, int ignitionValue);
-void step_fire(int *const buffer, int width, int height);
+typedef struct DoomFireBuffer {
+    int width;
+    int height;
+    int *buffer;
+} DoomFireBuffer;
+
+void create_buffer(int width, int height, DoomFireBuffer **const buffer);
+void destroy_buffer(DoomFireBuffer **const buffer);
+void init_buffer(DoomFireBuffer *const buffer, int ignitionValue);
+void step_fire(DoomFireBuffer *const buffer);
 
 static const uint8_t DOOM_RGB_VALUES[] = {
     0x07,0x07,0x07,

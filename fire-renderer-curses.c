@@ -14,20 +14,22 @@ static int paletteSize = 0;
 static void init_colours();
 static void init_custom_colours();
 
-int check_args(int argc, char **argv)
+int process_additional_args(int argc, char **argv)
 {
-    if (argc < 4)
+    if (argc < 1)
     {
-        printf("Missing param [USE_CUSTOM_COLOUR_PALETTE]\n");
-        printf("    N.B. Using a custom colour (1) palette will alter terminal colours.\n");
-        return 1;
+        printf("    -c    Use a custom colour palette");
+        printf("          N.B. Using custom palette will alter terminal colours.\n");
+        return 0;
     }
 
-    useCustomColours = atoi(argv[3]);
+    if (argv[0][1] == 'c')
+        useCustomColours = 1; 
+
     return 0;
 }
 
-int init_renderer(const int width, const int height)
+int init_renderer(const DoomFireBuffer *const buffer)
 {
     initscr();
     start_color();
@@ -35,7 +37,6 @@ int init_renderer(const int width, const int height)
     noecho();
     curs_set(0);
 
-    int useCustomColours = 0;
     if (useCustomColours == 1)
     {
         init_custom_colours();
@@ -45,16 +46,17 @@ int init_renderer(const int width, const int height)
         init_colours();
     }
 
+    clear();
     return 0;
 }
 
-void draw_buffer(const int *const buffer, const int width, const int height)
+void draw_buffer(DoomFireBuffer *const buffer)
 {
-    for (int y = 0; y < height; y++) 
+    for (int y = 0; y < buffer->height; y++) 
     {
-        for (int x = 0; x < width; x++) 
+        for (int x = 0; x < buffer->width; x++) 
         {
-            int pixel = buffer[x + (y * width)];
+            int pixel = buffer->buffer[x + (y * buffer->width)];
             int colorPair = pixelPalette[pixel];
             char output = ' '; 
             attron(COLOR_PAIR(colorPair));
@@ -63,7 +65,6 @@ void draw_buffer(const int *const buffer, const int width, const int height)
         }
     }
     refresh();
-
 }
 
 void wait()

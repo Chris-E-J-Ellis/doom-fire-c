@@ -6,12 +6,15 @@
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 
-int check_args(int argc, char **argv)
+int process_additional_args(int argc, char **argv)
 {
+    if (argc > 3)
+        return 1;
+
     return 0;
 }
 
-int init_renderer(const int width, const int height)
+int init_renderer(const DoomFireBuffer *const buffer)
 {
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -19,7 +22,7 @@ int init_renderer(const int width, const int height)
         return 1;
     }
 
-    SDL_CreateWindowAndRenderer(width, height, 0, &window, &renderer);
+    SDL_CreateWindowAndRenderer(buffer->width, buffer->height, 0, &window, &renderer);
     if( window == NULL )
     {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
@@ -29,13 +32,13 @@ int init_renderer(const int width, const int height)
     return 0;
 }
 
-void draw_buffer(const int *const buffer, const int width, const int height)
+void draw_buffer(DoomFireBuffer *const buffer)
 {
-    for (int y = 0; y < height; y++) 
+    for (int y = 0; y < buffer->height; y++) 
     {
-        for (int x = 0; x < width; x++) 
+        for (int x = 0; x < buffer->width; x++) 
         {
-            int pixel = buffer[x + (y * width)];
+            int pixel = buffer->buffer[x + (y * buffer->width)];
             int paletteIndex = pixel * 3;
             Uint8 r = DOOM_RGB_VALUES[paletteIndex];
             Uint8 g = DOOM_RGB_VALUES[paletteIndex + 1];
