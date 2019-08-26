@@ -8,6 +8,7 @@
 static volatile bool keepRunning = true;
 static void sig_handler(int input) 
 {
+    (void)input;
     keepRunning = false;
 }
 

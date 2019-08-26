@@ -31,6 +31,7 @@ int process_additional_args(int argc, char **argv)
 
 int init_renderer(const DoomFireBuffer *const buffer)
 {
+    (void)buffer;
     initscr();
     start_color();
     cbreak();

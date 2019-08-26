@@ -8,6 +8,8 @@ static SDL_Renderer* renderer = NULL;
 
 int process_additional_args(int argc, char **argv)
 {
+    (void)argv;
+
     if (argc > 3)
         return 1;
 
