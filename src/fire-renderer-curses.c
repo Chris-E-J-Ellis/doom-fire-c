@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "fire-engine.h"
 #include "fire-renderer.h"
+#include "fire-palette.h"
 
 #define MAX_PALETTE_SIZE 37
 
@@ -95,8 +96,8 @@ void init_colours()
         attroff(COLOR_PAIR(i));
     }
 
-    int reducedPalette[] = {16, 233, 234, 52, 52, 88, 124, 160, 196, 202, 208, 215, 220, 227, 229, 230, 15};
-    paletteSize = sizeof(reducedPalette)/sizeof(int);
+    uint8_t reducedPalette[] = {16, 233, 234, 52, 52, 88, 124, 160, 196, 202, 208, 215, 220, 227, 229, 230, 15};
+    paletteSize = sizeof(reducedPalette)/sizeof(uint8_t);
 
     printw("\nSelected Palette:\n");
     for (int i = 0; i < paletteSize; i++)
@@ -115,7 +116,7 @@ void init_custom_colours()
 {
     printw("Selected Palette:\n");
     float colorScalefactor = 1000.0/256;
-    int availableRGBValues = sizeof(DOOM_RGB_VALUES)/sizeof(int)/3;
+    int availableRGBValues = get_palette_size(); 
     paletteSize = availableRGBValues;
 
     for (int i = 0; i < availableRGBValues; i++)

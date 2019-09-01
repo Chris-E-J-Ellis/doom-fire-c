@@ -4,10 +4,10 @@ SRCDIR=src
 INCDIR=include
 CFLAGS=-I$(INCDIR) -Wall -Wextra
 
-_DEPENDENCIES = fire-engine.h fire-renderer.h
+_DEPENDENCIES = fire-engine.h fire-renderer.h fire-palette.h
 DEPENDENCIES = $(patsubst %,$(INCDIR)/%,$(_DEPENDENCIES))
 
-_OBJ = doom-fire.o fire-engine.o
+_OBJ = doom-fire.o fire-engine.o fire-palette.o
 OBJ = $(patsubst %,$(OBJDIR)/%,$(_OBJ))
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(DEPENDENCIES)

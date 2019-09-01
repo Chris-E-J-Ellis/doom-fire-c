@@ -63,3 +63,4 @@ static void spread_fire(int *const buffer, int sourcePosition, int width)
         buffer[destinationPosition] = pixel - (decay & 1);
     }
 }
+

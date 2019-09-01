@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include "fire-renderer.h"
 #include "fire-engine.h"
+#include "fire-palette.h"
 
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
@@ -25,7 +26,7 @@ int init_renderer(const DoomFireBuffer *const buffer)
     }
 
     SDL_CreateWindowAndRenderer(buffer->width, buffer->height, 0, &window, &renderer);
-    if( window == NULL )
+    if(window == NULL)
     {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         return 1;
@@ -79,6 +80,6 @@ void cleanup_renderer()
 
 int get_max_ignition_value()
 {
-    int paletteSize = sizeof(DOOM_RGB_VALUES)/sizeof(uint8_t) / 3;
+    int paletteSize = get_palette_size(); 
     return paletteSize - 1;
 }
