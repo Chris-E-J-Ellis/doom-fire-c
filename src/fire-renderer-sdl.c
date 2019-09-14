@@ -3,7 +3,6 @@
 #include "fire-renderer.h"
 #include "fire-engine.h"
 #include "fire-palette.h"
-#include <time.h>
 
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
@@ -54,11 +53,6 @@ int init_renderer(const DoomFireBuffer *const buffer)
 
 void draw_buffer(DoomFireBuffer *const buffer)
 {
-    clock_t start;
-    clock_t diff;
-
-    start = clock();
-
     for (int y = 0; y < buffer->height; y++)
     {
         for (int x = 0; x < buffer->width; x++)
@@ -73,19 +67,12 @@ void draw_buffer(DoomFireBuffer *const buffer)
             Uint32 *target_pixel = (Uint32 *)(pixels + y * bufferSurface->pitch 
                     + x * sizeof(*target_pixel));
 
-            int surfaceIndex = y * bufferSurface->pitch + x * 4;
-            pixels[surfaceIndex] = b;
-            pixels[surfaceIndex+1] = g;
-            pixels[surfaceIndex+2] = r;
+            *target_pixel = r << 16 | g << 8 | b;
         }
     }
 
     SDL_BlitSurface(bufferSurface, NULL, windowSurface, NULL);
     SDL_UpdateWindowSurface(window);
-
-    diff = (double)(clock() - start);
-    int msec = diff * 1000 / CLOCKS_PER_SEC;
-    fprintf(stdout, "Time taken %d milliseconds\n", msec%1000);
 }
 
 void wait()
@@ -106,8 +93,14 @@ bool exit_requested()
 
 void cleanup_renderer()
 {
+    SDL_FreeSurface(bufferSurface);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    bufferSurface = NULL;
+    renderer = NULL;
+    windowSurface = NULL;
+    window = NULL;
+    
     SDL_Quit();
 }
 
