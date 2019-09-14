@@ -8,7 +8,7 @@
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 static SDL_Surface* windowSurface = NULL; 
-static SDL_Surface* surface = NULL; 
+static SDL_Surface* bufferSurface = NULL; 
 
 int process_additional_args(int argc, char **argv)
 {
@@ -34,9 +34,20 @@ int init_renderer(const DoomFireBuffer *const buffer)
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         return 1;
     }
-    windowSurface = SDL_GetWindowSurface(window);
-    surface = SDL_CreateRGBSurface(0, buffer->width, buffer->height, 32, 0, 0, 0, 0);
 
+    windowSurface = SDL_GetWindowSurface(window);
+    if(windowSurface == NULL)
+    {
+        printf("Window surface could not be created! SDL_Error: %s\n", SDL_GetError());
+        return 1;
+    }
+
+    bufferSurface = SDL_CreateRGBSurface(0, buffer->width, buffer->height, 32, 0, 0, 0, 0);
+    if(bufferSurface == NULL)
+    {
+        printf("Buffer surface could not be created! SDL_Error: %s\n", SDL_GetError());
+        return 1;
+    }
 
     return 0;
 }
@@ -48,9 +59,9 @@ void draw_buffer(DoomFireBuffer *const buffer)
 
     start = clock();
 
-    for (int y = 0; y < buffer->height; y++) 
+    for (int y = 0; y < buffer->height; y++)
     {
-        for (int x = 0; x < buffer->width; x++) 
+        for (int x = 0; x < buffer->width; x++)
         {
             int pixel = buffer->buffer[x + (y * buffer->width)];
             int paletteIndex = pixel * 3;
@@ -58,15 +69,18 @@ void draw_buffer(DoomFireBuffer *const buffer)
             Uint8 g = DOOM_RGB_VALUES[paletteIndex + 1];
             Uint8 b = DOOM_RGB_VALUES[paletteIndex + 2]; 
 
-            Uint8 *pixels = (Uint8 *)surface->pixels;
-            Uint32 *target_pixel = (Uint32 *)(pixels + y * surface->pitch 
-                + x * sizeof(*target_pixel)); 
-                
-            *target_pixel = r << 16 | g << 8 | b;
+            Uint8 *pixels = (Uint8 *)bufferSurface->pixels;
+            Uint32 *target_pixel = (Uint32 *)(pixels + y * bufferSurface->pitch 
+                    + x * sizeof(*target_pixel));
+
+            int surfaceIndex = y * bufferSurface->pitch + x * 4;
+            pixels[surfaceIndex] = b;
+            pixels[surfaceIndex+1] = g;
+            pixels[surfaceIndex+2] = r;
         }
     }
 
-    SDL_BlitSurface(surface, NULL, windowSurface, NULL);
+    SDL_BlitSurface(bufferSurface, NULL, windowSurface, NULL);
     SDL_UpdateWindowSurface(window);
 
     diff = (double)(clock() - start);
