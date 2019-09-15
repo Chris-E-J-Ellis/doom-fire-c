@@ -25,7 +25,7 @@ int process_additional_args(int argc, char **argv)
     }
 
     if (argv[0][1] == 'c')
-        useCustomColours = 1; 
+        useCustomColours = 1;
 
     return 0;
 }
@@ -54,13 +54,13 @@ int init_renderer(const DoomFireBuffer *const buffer)
 
 void draw_buffer(DoomFireBuffer *const buffer)
 {
-    for (int y = 0; y < buffer->height; y++) 
+    for (int y = 0; y < buffer->height; y++)
     {
-        for (int x = 0; x < buffer->width; x++) 
+        for (int x = 0; x < buffer->width; x++)
         {
             int pixel = buffer->buffer[x + (y * buffer->width)];
             int colorPair = pixelPalette[pixel];
-            char output = ' '; 
+            char output = ' ';
             attron(COLOR_PAIR(colorPair));
             mvaddch(y, x, output);
             attroff(COLOR_PAIR(colorPair));
@@ -116,7 +116,7 @@ void init_custom_colours()
 {
     printw("Selected Palette:\n");
     float colorScalefactor = 1000.0/256;
-    int availableRGBValues = get_palette_size(); 
+    int availableRGBValues = get_palette_size();
     paletteSize = availableRGBValues;
 
     for (int i = 0; i < availableRGBValues; i++)
@@ -124,7 +124,7 @@ void init_custom_colours()
         int colorIndex = i + 50; // Not saving the terminal colours, try not to hit the common ones.
         int paletteIndex = i * 3;
         float red = (float)DOOM_RGB_VALUES[paletteIndex] * colorScalefactor;
-        float green = (float)DOOM_RGB_VALUES[paletteIndex + 1] * colorScalefactor; 
+        float green = (float)DOOM_RGB_VALUES[paletteIndex + 1] * colorScalefactor;
         float blue = (float)DOOM_RGB_VALUES[paletteIndex + 2] * colorScalefactor;
 
         init_color(colorIndex, (int)red, (int)green, (int)blue);
@@ -142,5 +142,5 @@ void init_custom_colours()
 
 int get_max_ignition_value()
 {
-    return paletteSize - 1; 
+    return paletteSize - 1;
 }

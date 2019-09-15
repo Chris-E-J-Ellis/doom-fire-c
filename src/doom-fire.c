@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <signal.h>
-#include "fire-engine.h" 
+#include "fire-engine.h"
 #include "fire-renderer.h"
 
 static volatile bool keepRunning = true;
-static void sig_handler(int input) 
+static void sig_handler(int input)
 {
     (void)input;
     keepRunning = false;
@@ -14,7 +14,7 @@ static void sig_handler(int input)
 
 int main(int argc, char **argv)
 {
-    bool argumentError = false; 
+    bool argumentError = false;
 
     if (argc < 3)
     {
@@ -42,14 +42,14 @@ int main(int argc, char **argv)
     if (initSuccessful != 0)
         return initSuccessful;
 
-    int ignitionValue = get_max_ignition_value(); 
+    int ignitionValue = get_max_ignition_value();
     init_buffer(buffer, ignitionValue);
 
     signal(SIGINT, sig_handler);
 
     while (keepRunning)
     {
-        if (exit_requested()) 
+        if (exit_requested())
             keepRunning = false;
 
         draw_buffer(buffer);

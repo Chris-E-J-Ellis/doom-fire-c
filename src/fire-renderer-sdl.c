@@ -6,8 +6,9 @@
 
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
-static SDL_Surface* windowSurface = NULL; 
-static SDL_Surface* bufferSurface = NULL; 
+static SDL_Surface* windowSurface = NULL;
+static SDL_Surface* bufferSurface = NULL;
+static SDL_Rect renderRect = { .x = 0, .y = 0 };
 
 int process_additional_args(int argc, char **argv)
 {
@@ -48,6 +49,8 @@ int init_renderer(const DoomFireBuffer *const buffer)
         return 1;
     }
 
+    SDL_GetWindowSize(window, &renderRect.w, &renderRect.h);
+
     return 0;
 }
 
@@ -61,17 +64,17 @@ void draw_buffer(DoomFireBuffer *const buffer)
             int paletteIndex = pixel * 3;
             Uint8 r = DOOM_RGB_VALUES[paletteIndex];
             Uint8 g = DOOM_RGB_VALUES[paletteIndex + 1];
-            Uint8 b = DOOM_RGB_VALUES[paletteIndex + 2]; 
+            Uint8 b = DOOM_RGB_VALUES[paletteIndex + 2];
 
-            Uint8 *pixels = (Uint8 *)bufferSurface->pixels;
-            Uint32 *target_pixel = (Uint32 *)(pixels + y * bufferSurface->pitch 
-                    + x * sizeof(*target_pixel));
+            Uint8 *bufferPixels = (Uint8 *)bufferSurface->pixels;
+            Uint32 *targetPixel = (Uint32 *)(bufferPixels + y * bufferSurface->pitch
+                    + x * sizeof(*targetPixel));
 
-            *target_pixel = r << 16 | g << 8 | b;
+            *targetPixel = r << 16 | g << 8 | b;
         }
     }
 
-    SDL_BlitSurface(bufferSurface, NULL, windowSurface, NULL);
+    SDL_BlitScaled(bufferSurface, NULL, windowSurface, &renderRect);
     SDL_UpdateWindowSurface(window);
 }
 
@@ -87,6 +90,18 @@ bool exit_requested()
     {
         if(e.type == SDL_QUIT)
             return true;
+
+        // Seems like this can hang out here.
+        if (e.type == SDL_WINDOWEVENT)
+        {
+            if(e.window.event == SDL_WINDOWEVENT_RESIZED)
+            {
+                SDL_FreeSurface(windowSurface);
+                windowSurface = SDL_GetWindowSurface(window);
+                SDL_GetWindowSize(window, &renderRect.w, &renderRect.h);
+            }
+        }
+
     }
     return false;
 }
@@ -100,12 +115,12 @@ void cleanup_renderer()
     renderer = NULL;
     windowSurface = NULL;
     window = NULL;
-    
+
     SDL_Quit();
 }
 
 int get_max_ignition_value()
 {
-    int paletteSize = get_palette_size(); 
+    int paletteSize = get_palette_size();
     return paletteSize - 1;
 }

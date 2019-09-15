@@ -2,7 +2,7 @@ CC=gcc
 OBJDIR=obj
 SRCDIR=src
 INCDIR=include
-CFLAGS=-I$(INCDIR) -Wall -Wextra
+CFLAGS=-I$(INCDIR) -Wall -Wextra -Wpedantic
 
 _DEPENDENCIES = fire-engine.h fire-renderer.h fire-palette.h
 DEPENDENCIES = $(patsubst %,$(INCDIR)/%,$(_DEPENDENCIES))
