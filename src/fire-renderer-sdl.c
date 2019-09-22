@@ -50,8 +50,13 @@ int init_renderer(const DoomFireBuffer *const buffer)
     }
 
     SDL_GetWindowSize(window, &renderRect.w, &renderRect.h);
-
     return 0;
+}
+
+int get_max_ignition_value()
+{
+    int paletteSize = get_palette_size();
+    return paletteSize - 1;
 }
 
 void draw_buffer(DoomFireBuffer *const buffer)
@@ -117,10 +122,4 @@ void cleanup_renderer()
     window = NULL;
 
     SDL_Quit();
-}
-
-int get_max_ignition_value()
-{
-    int paletteSize = get_palette_size();
-    return paletteSize - 1;
 }

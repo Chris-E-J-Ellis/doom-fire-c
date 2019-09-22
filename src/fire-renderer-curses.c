@@ -6,10 +6,8 @@
 #include "fire-renderer.h"
 #include "fire-palette.h"
 
-#define MAX_PALETTE_SIZE 37
-
 static int useCustomColours;
-static int pixelPalette[MAX_PALETTE_SIZE];
+static int *pixelPalette = NULL;
 static int paletteSize = 0;
 
 static void init_colours();
@@ -52,6 +50,11 @@ int init_renderer(const DoomFireBuffer *const buffer)
     return 0;
 }
 
+int get_max_ignition_value()
+{
+    return paletteSize - 1;
+}
+
 void draw_buffer(DoomFireBuffer *const buffer)
 {
     for (int y = 0; y < buffer->height; y++)
@@ -81,6 +84,8 @@ bool exit_requested()
 
 void cleanup_renderer()
 {
+    free(pixelPalette);
+    pixelPalette = NULL;
     clear();
     endwin();
 }
@@ -98,14 +103,15 @@ void init_colours()
 
     uint8_t reducedPalette[] = {16, 233, 234, 52, 52, 88, 124, 160, 196, 202, 208, 215, 220, 227, 229, 230, 15};
     paletteSize = sizeof(reducedPalette)/sizeof(uint8_t);
+    pixelPalette = malloc(paletteSize * sizeof(int));
 
     printw("\nSelected Palette:\n");
     for (int i = 0; i < paletteSize; i++)
     {
         pixelPalette[i] = reducedPalette[i];
-        attron(COLOR_PAIR(pixelPalette[i]));
+        attron(COLOR_PAIR(reducedPalette[i]));
         printw("%i ", i);
-        attroff(COLOR_PAIR(pixelPalette[i]));
+        attroff(COLOR_PAIR(reducedPalette[i]));
     }
 
     refresh();
@@ -116,10 +122,10 @@ void init_custom_colours()
 {
     printw("Selected Palette:\n");
     float colorScalefactor = 1000.0/256;
-    int availableRGBValues = get_palette_size();
-    paletteSize = availableRGBValues;
+    paletteSize = get_palette_size();
+    pixelPalette = malloc(paletteSize * sizeof(int));
 
-    for (int i = 0; i < availableRGBValues; i++)
+    for (int i = 0; i < paletteSize; i++)
     {
         int colorIndex = i + 50; // Not saving the terminal colours, try not to hit the common ones.
         int paletteIndex = i * 3;
@@ -138,9 +144,4 @@ void init_custom_colours()
 
     refresh();
     usleep(2000000);
-}
-
-int get_max_ignition_value()
-{
-    return paletteSize - 1;
 }
