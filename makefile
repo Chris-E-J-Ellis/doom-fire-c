@@ -11,6 +11,7 @@ _OBJ = doom-fire.o fire-engine.o fire-palette.o
 OBJ = $(patsubst %,$(OBJDIR)/%,$(_OBJ))
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(DEPENDENCIES)
+	@mkdir -p $(@D)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 all: doom-fire-sdl doom-fire-curses
